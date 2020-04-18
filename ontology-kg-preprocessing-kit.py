@@ -131,6 +131,7 @@ def sparql_in_filter(l):
         f1+=e+", "
     f1 = f1.strip()[:-1]
     f1+=')) '
+    return f1
 
 def get_default_sparql_header(curie_map):
     sparql = ['prefix owl: <http://www.w3.org/2002/07/owl#>']
