@@ -1,0 +1,33 @@
+robot_opts: -vv
+clean: False
+working_directory: /work
+curie_map:
+  RO: http://purl.obolibrary.org/obo/RO_
+  HP: http://purl.obolibrary.org/obo/HP_
+  BFO: http://purl.obolibrary.org/obo/BFO_
+  UPHENO: http://purl.obolibrary.org/obo/UPHENO_
+global:
+  chains: []
+  relations: []
+  annotations:
+    - rdfs:label
+    - skos:exactMatch
+ontologies:
+  - id: hp
+    sources: 
+      - http://purl.obolibrary.org/obo/hp.owl
+    roots:
+      - HP:0000118
+    relations:
+      - id: UPHENO:0000001
+        materialize: true
+        chains:
+          - BFO:0000051|RO:0000052
+      - id: BFO:0000051
+        materialize: true
+  - id: mondo
+    sources: 
+      - http://purl.obolibrary.org/obo/mondo.owl
+  - id: go
+    sources: 
+      - http://purl.obolibrary.org/obo/go/go-plus.owl
