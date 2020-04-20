@@ -1,2 +1,3 @@
-# ontology-kg-preprocessing-kit
-Simple preprocessing kit for beating a set of ontologies into shape for KG ingestion
+# Ontology Knowledge Graph Preprocessing Kit (OKPK)
+
+Ontologies are sets of, often complex, axioms that only map poorly to
