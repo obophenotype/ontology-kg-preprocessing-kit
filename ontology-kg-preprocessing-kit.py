@@ -27,12 +27,12 @@ TIMEOUT=str(config.get_external_timeout())
 ws = config.get_working_directory()
 robot_opts=config.get_robot_opts()
 
-print("REMOVE ENV ENV")
-print("REMOVE ENV ENV")
-print("REMOVE ENV ENV")
-print("REMOVE ENV ENV")
-os.environ['BUILDDIR']='build'
-os.environ['SPARQLDIR']='sparql'
+#print("REMOVE ENV ENV")
+#print("REMOVE ENV ENV")
+#print("REMOVE ENV ENV")
+#print("REMOVE ENV ENV")
+#os.environ['BUILDDIR']='build'
+#os.environ['SPARQLDIR']='sparql'
 
 ontology_dir = os.path.join("ontologies")
 build_dir = os.path.join(os.environ['BUILDDIR'])
