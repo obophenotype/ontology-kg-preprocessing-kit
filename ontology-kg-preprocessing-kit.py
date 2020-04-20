@@ -129,7 +129,7 @@ for o in config.get_ontologies():
     print("Export {} to KGX compliant csv...".format(o))
     if not skip or not os.path.exists(o_biolink):
         robot_update(o_enriched,biolink_annotations_sparqls,o_biolink,TIMEOUT)
-        robot_query(o_biolink,o_biolink_category_ttl,construct_kgx_types_sparql,format='ttl',TIMEOUT)
+        robot_query(o_biolink,o_biolink_category_ttl,construct_kgx_types_sparql,format='ttl',TIMEOUT=TIMEOUT)
         robot_merge([o_finished,o_biolink_category_ttl,o_biolink_relations_ttl],o_biolink,TIMEOUT)
     if not skip or not os.path.exists(o_kg_nodes_tsv):
         robot_query(o_biolink,o_kg_nodes_tsv,kgx_nodes_sparql)
