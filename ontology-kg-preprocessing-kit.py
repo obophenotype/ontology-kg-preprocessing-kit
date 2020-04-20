@@ -107,20 +107,20 @@ for o in config.get_ontologies():
     
     print("Enriching {} with implied relations...".format(o))
     if not skip or not os.path.exists(o_enriched):
-        robot_okpk_enrich(o_merge_list,o_materialise_properties,o_enriched)
+        robot_okpk_enrich(o_merge_list,o_materialise_properties,o_enriched,TIMEOUT)
     if not skip or not os.path.exists(o_count_annotation_properties_csv):
-        robot_query(o_enriched,o_count_annotation_properties_csv,o_count_annotation_properties_sparql)
+        robot_query(o_enriched,o_count_annotation_properties_csv,o_count_annotation_properties_sparql,TIMEOUT)
     if not skip or not os.path.exists(o_count_object_properties_csv):
-        robot_query(o_enriched,o_count_object_properties_csv,o_count_object_properties_sparql)
+        robot_query(o_enriched,o_count_object_properties_csv,o_count_object_properties_sparql,TIMEOUT)
     
     print("Filtering {} for classes and relationships of interest...".format(o))
     if not skip or not os.path.exists(o_reduced):
-        robot_okpk_reduce(o_enriched,o_properties,o_reduced)
+        robot_okpk_reduce(o_enriched,o_properties,o_reduced,TIMEOUT)
     if not skip or not os.path.exists(o_seed):
-        robot_query(o_reduced,o_seed_table,o_seed_sparql)
+        robot_query(o_reduced,o_seed_table,o_seed_sparql,TIMEOUT)
         prepare_seed_file(o_seed_table,o_annotation_properties,o_seed)
     if not skip or not os.path.exists(o_finished): 
-        robot_okpk_finish(o_reduced,o_seed,o_finished)
+        robot_okpk_finish(o_reduced,o_seed,o_finished,TIMEOUT)
     
     print("Export {} to obographs (JSON)...".format(o))
     if not skip or not os.path.exists(o_kg_json): 
@@ -128,9 +128,9 @@ for o in config.get_ontologies():
 
     print("Export {} to KGX compliant csv...".format(o))
     if not skip or not os.path.exists(o_biolink):
-        robot_update(o_enriched,biolink_annotations_sparqls,o_biolink)
-        robot_query(o_biolink,o_biolink_category_ttl,construct_kgx_types_sparql,format='ttl')
-        robot_merge([o_finished,o_biolink_category_ttl,o_biolink_relations_ttl],o_biolink)
+        robot_update(o_enriched,biolink_annotations_sparqls,o_biolink,TIMEOUT)
+        robot_query(o_biolink,o_biolink_category_ttl,construct_kgx_types_sparql,format='ttl',TIMEOUT)
+        robot_merge([o_finished,o_biolink_category_ttl,o_biolink_relations_ttl],o_biolink,TIMEOUT)
     if not skip or not os.path.exists(o_kg_nodes_tsv):
         robot_query(o_biolink,o_kg_nodes_tsv,kgx_nodes_sparql)
     if not skip or not os.path.exists(o_kg_edges_tsv):
