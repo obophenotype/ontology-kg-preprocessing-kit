@@ -397,9 +397,10 @@ def robot_okpk_enrich(ontologies,materialize_props,ontology_path, TIMEOUT="60m",
         for o in ontologies:
             cmd.extend(['-i', o])
         cmd.extend(['reason', '--reasoner', 'ELK', 'reduce','--reasoner', 'ELK'])
-        cmd.extend(['materialize', '--reasoner', 'ELK'])
-        for p in materialize_props:
-            cmd.extend(['--term', p])
+        if materialize_props:
+            cmd.extend(['materialize', '--reasoner', 'ELK'])
+            for p in materialize_props:
+                cmd.extend(['--term', p])
         cmd.extend(['relax'])
         cmd.extend(['-o',ontology_path])
         check_call(cmd)
@@ -411,10 +412,11 @@ def robot_okpk_reduce(o,properties,ontology_path, TIMEOUT="60m", robot_opts="-v"
     try:
         cmd = ['timeout',TIMEOUT]
         cmd.extend(['robot',robot_opts])
-        cmd.extend(['remove', '-i',o])
-        for p in properties:
-            cmd.extend(['--term', p])
-        cmd.extend(['--select','complement','--select', 'object-properties'])
+        if properties:
+            cmd.extend(['remove', '-i',o])
+            for p in properties:
+                cmd.extend(['--term', p])
+            cmd.extend(['--select','complement','--select', 'object-properties'])
         cmd.extend(['-o',ontology_path])
         check_call(cmd)
     except Exception as e:
