@@ -135,7 +135,7 @@ for o in config.get_ontologies():
         robot_query(o_biolink,o_kg_nodes_tsv,kgx_nodes_sparql)
     if not skip or not os.path.exists(o_kg_edges_tsv):
         o_kg_edges_rel_tsv = os.path.join(o_build_dir,"kgx_{}_edges_relations.csv".format(o))
-        o_kg_edgdes_cl_tsv = os.path.join(o_build_dir,"kgx_{}_edgdes_cl.csv".format(o))
+        o_kg_edges_cl_tsv = os.path.join(o_build_dir,"kgx_{}_edges_cl.csv".format(o))
         robot_query(o_biolink,o_kg_edges_rel_tsv,kgx_edges_sparql)
         robot_query(o_biolink,o_kg_edges_cl_tsv,kgx_edges_cl_sparql)
         df_kg_nodes = [pd.read_csv(o_kg_edges_rel_tsv),pd.read_csv(o_kg_edges_cl_tsv)]
