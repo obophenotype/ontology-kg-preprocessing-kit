@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from subprocess import check_call
 import urllib.request
-import ruamel.yaml
+import yaml
 import warnings
 import re
 
