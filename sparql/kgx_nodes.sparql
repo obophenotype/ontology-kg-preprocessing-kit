@@ -1,0 +1,28 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix obo: <http://purl.obolibrary.org/obo/>
+prefix biolink: <https://w3id.org/biolink/vocab/>
+
+SELECT ?id ?name ?iri ?description ?category WHERE 
+{
+?iri a owl:Class .
+OPTIONAL { ?iri rdfs:label ?name . } .
+OPTIONAL { ?iri obo:IAO_0000115 ?description . } .
+OPTIONAL { ?iri biolink:category ?cat . } .
+FILTER(isIRI(?iri)) 
+BIND(
+	IF(	
+		regex(str(?iri), "http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]EFO[_]")
+			|| regex(str(?iri), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]")
+			|| regex(str(?iri), "http[:][/][/]www[.]orpha.net[/]ORDO[/]"),
+		REPLACE(
+			REPLACE(STR(?iri), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]|http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]|http[:][/][/]www[.]orpha.net[/]ORDO[/]", "", "i"),
+		"[_]", ":", "i")
+		,?iri) 
+	AS ?id)
+BIND(
+	REPLACE(
+			REPLACE(STR(?cat), "https[:][/][/]w3id[.]org[/]biolink[/]vocab[/]", "biolink:", "i"),
+		"[_]", ":", "i") AS ?category)
+}

@@ -1,0 +1,37 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix obo: <http://purl.obolibrary.org/obo/>
+prefix biolink: <https://w3id.org/biolink/vocab/>
+
+SELECT ?id ?annotation ?value WHERE 
+{
+?iri a owl:Class .
+?iri ?anno ?value .
+?anno a owl:AnnotationProperty .
+FILTER(isIRI(?iri))
+FILTER(?anno != biolink:category)
+BIND(
+	IF(	
+		regex(str(?iri), "http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]EFO[_]")
+			|| regex(str(?iri), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]")
+			|| regex(str(?iri), "http[:][/][/]www[.]orpha.net[/]ORDO[/]"),
+		REPLACE(
+			REPLACE(STR(?iri), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]|http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]|http[:][/][/]www[.]orpha.net[/]ORDO[/]", "", "i"),
+		"[_]", ":", "i")
+		,?iri) 
+	AS ?id)
+	
+BIND(
+	IF(	
+		regex(str(?anno), "http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]EFO[_]")
+			|| regex(str(?anno), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]")
+			|| regex(str(?anno), "http[:][/][/]www[.]w3[.]org[/]2000[/]01[/]rdf[-]schema[#]")
+			|| regex(str(?anno), "http[:][/][/]www[.]orpha.net[/]ORDO[/]"),
+		REPLACE(
+			REPLACE(
+				REPLACE(STR(?anno),"http[:][/][/]www[.]w3[.]org[/]2000[/]01[/]rdf[-]schema[#]","rdfs:","i"), 
+			"http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]|http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]|http[:][/][/]www[.]orpha.net[/]ORDO[/]", "", "i"),
+		"[_]", ":", "i"), ?anno) 
+	AS ?annotation)
+}

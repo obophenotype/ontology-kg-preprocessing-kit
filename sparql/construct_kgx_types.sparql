@@ -1,0 +1,12 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix obo: <http://purl.obolibrary.org/obo/>
+prefix biolink: <https://w3id.org/biolink/vocab/>
+
+CONSTRUCT { ?s ?p ?o .} WHERE 
+{
+?s ?p ?o .
+FILTER(?p IN (biolink:category, biolink:relation))
+FILTER(isIRI(?s))
+}

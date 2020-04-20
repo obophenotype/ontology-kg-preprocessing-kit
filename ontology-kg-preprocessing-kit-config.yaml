@@ -6,20 +6,27 @@ curie_map:
   HP: http://purl.obolibrary.org/obo/HP_
   BFO: http://purl.obolibrary.org/obo/BFO_
   UPHENO: http://purl.obolibrary.org/obo/UPHENO_
+  oio: http://www.geneontology.org/formats/oboInOwl#
+  IAO: http://purl.obolibrary.org/obo/IAO_
+  dce: http://purl.org/dc/elements/1.1/
 global:
   chains: []
   relations: []
   annotations:
-    - rdfs:label
-    - skos:exactMatch
+    - id: rdfs:label
+    - id: skos:exactMatch
+    - id: oio:hasExactSynonym
+    - id: IAO:0000115
 ontologies:
   - id: hp
     sources: 
       - http://purl.obolibrary.org/obo/hp.owl
     roots:
-      - HP:0000118
+      - id: HP:0000118
+        biolink: biolink:PhenotypicFeature
     relations:
       - id: UPHENO:0000001
+        biolink: biolink:DiseaseOrPhenotypicFeatureAssociationToThingAssociation
         materialize: true
         chains:
           - BFO:0000051|RO:0000052

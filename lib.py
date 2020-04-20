@@ -7,43 +7,42 @@ class okpk_config:
     def __init__(self, config_file):
         self.config = yaml.load(open(config_file, 'r'))
 
-    def get_download_location(self, id):
-        return [t['mirror_from'] for t in self.config.get("sources") if t['id'] == id][0]
-
     def get_curie_map(self):
         return self.config.get("curie_map")
+        
+    def get_value_map(self,id,e0,e1,e2):
+        map = dict()
+        for t in self.config.get(e0):
+            if t['id'] == id:   
+                if e1 in t:
+                    for r in t.get(e1):
+                        if e2 in r:
+                            map[r['id']] = r[e2]
+        return map
+    
+    def get_biolink_relation_map(self,id):
+        relations = dict()
+        for t in self.config.get("global").get("relations"):
+            if "biolink" in t:
+                relations[t['id']] = r["biolink"]
+        relations.update(self.get_value_map(id,"ontologies","relations","biolink"))
+        return relations
 
+    def get_biolink_category_map(self,id):
+        return self.get_value_map(id,"ontologies","roots","biolink")
+        
     def get_role_chains(self, id):
-        chains = dict()
-        for t in self.config.get("ontologies"):
-            if t['id'] == id:
-                if "relations" in t:
-                    for r in t.get("relations"):
-                        if "chains" in r:
-                            chains[r['id']] = r['chains']
-        return chains
-
-    def get_file_location(self, id):
-        return [t['file_path'] for t in self.config.get("sources") if t['id'] == id][0]
+        return self.get_value_map(id,"ontologies","relations","chains")
 
     def get_ontologies(self):
         return [t['id'] for t in self.config.get("ontologies")]
         
-    def get_upheno_intermediate_layer_depth(self):
-        return int(self.config.get("upheno_intermediate_layer_depth"))
-    
     def get_remove_disjoints(self):
         return self.config.get("remove_disjoints")
 
     def get_remove_blacklist(self):
         return self.config.get("remove_blacklist")
         
-    def get_blacklisted_upheno_ids(self):
-        return self.config.get("blacklisted_upheno_iris")
-
-    def get_upheno_axiom_blacklist(self):
-        return self.config.get("upheno_axiom_blacklist")
-
     def get_dependencies(self, id):
         dependencies = []
         dependencies.extend(self.config.get("common_dependencies"))
@@ -65,7 +64,15 @@ class okpk_config:
         return [t['prefix_iri'] for t in self.config.get("sources") if t['id'] == id][0]
 
     def get_roots(self, id):
-        return [t['roots'] for t in self.config.get("ontologies") if t['id'] == id][0]
+        roots = []
+        for t in self.config.get("ontologies"):
+            if (t['id'] == id) & ("roots" in t):
+                for root in t['roots']:
+                    roots.append(root['id'])
+        if roots:
+            return roots     
+        else:   
+            return ['owl:Thing']
 
     def is_clean_dir(self):
         return self.config.get("clean")
@@ -88,6 +95,12 @@ class okpk_config:
                         else:
                             props.append(r['id'])
         return props
+        
+    def get_ontology_annotation_properties(self, id):
+        relations = []
+        for t in self.config.get("global").get("annotations"):
+            relations.append(t['id'])
+        return relations
 
     def get_external_timeout(self):
         return str(self.config.get("timeout_external_processes"))
@@ -110,11 +123,6 @@ class okpk_config:
     def get_robot_java_args(self):
         return self.config.get("robot_java_args")
 
-    def set_path_for_ontology(self, id, path):
-        for t in self.config.get("sources"):
-            if t['id'] == id:
-                t['file_path'] = path
-
 
 def cdir(path):
     if not os.path.exists(path):
@@ -124,14 +132,25 @@ def robot_extract_seed(ontology_path,seedfile,sparql_terms, TIMEOUT="60m", robot
     print("Extracting seed of "+ontology_path+" with "+sparql_terms)
     robot_query(ontology_path,seedfile,sparql_terms, TIMEOUT, robot_opts)
 
-def robot_query(ontology_path,query_result,sparql_query, TIMEOUT="60m", robot_opts="-v"):
+def robot_query(ontology_path,query_result,sparql_query, TIMEOUT="60m", robot_opts="-v",format='csv'):
     print("Querying "+ontology_path+" with "+sparql_query)
     try:
-        check_call(['timeout',TIMEOUT,'robot', 'query',robot_opts,'--use-graphs','true','-f','csv','-i', ontology_path,'--query', sparql_query, query_result])
+        check_call(['timeout',TIMEOUT,'robot', 'query',robot_opts,'--use-graphs','true','-f',format,'-i', ontology_path,'--query', sparql_query, query_result])
     except Exception as e:
         print(e.output)
         raise Exception("Querying {} with {} failed".format(ontology_path,sparql_query))
 
+def robot_update(ontology_path,sparql_queries,ontology_out_path, TIMEOUT="60m", robot_opts="-v"):
+    print("Querying "+ontology_path+" with "+str(sparql_queries))
+    try:
+        robot = ['timeout',TIMEOUT,'robot', 'query',robot_opts,'-i', ontology_path]
+        for ru in sparql_queries:
+            robot.extend(['--update', ru])
+        robot.extend(['--output', ontology_out_path])
+        check_call(robot)
+    except Exception as e:
+        print(e.output)
+        raise Exception("Querying {} with {} failed".format(ontology_path,sparql_queries))
 
 def robot_extract_module(ontology_path,seedfile, ontology_merged_path, TIMEOUT="60m", robot_opts="-v"):
     print("Extracting module of "+ontology_path+" to "+ontology_merged_path)
