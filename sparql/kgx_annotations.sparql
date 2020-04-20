@@ -27,10 +27,13 @@ BIND(
 		regex(str(?anno), "http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]EFO[_]")
 			|| regex(str(?anno), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]")
 			|| regex(str(?anno), "http[:][/][/]www[.]w3[.]org[/]2000[/]01[/]rdf[-]schema[#]")
+			|| regex(str(?anno), "http[:][/][/]www[.]w3[.]org[/]2002[/]07[/]owl[#]")
 			|| regex(str(?anno), "http[:][/][/]www[.]orpha.net[/]ORDO[/]"),
 		REPLACE(
 			REPLACE(
-				REPLACE(STR(?anno),"http[:][/][/]www[.]w3[.]org[/]2000[/]01[/]rdf[-]schema[#]","rdfs:","i"), 
+				REPLACE(
+					REPLACE(STR(?anno),"http[:][/][/]www[.]w3[.]org[/]2000[/]01[/]rdf[-]schema[#]","rdfs:","i"),
+				"http[:][/][/]www[.]w3[.]org[/]2002[/]07[/]owl[#]","owl:","i"),
 			"http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]|http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]|http[:][/][/]www[.]orpha.net[/]ORDO[/]", "", "i"),
 		"[_]", ":", "i"), ?anno) 
 	AS ?annotation)

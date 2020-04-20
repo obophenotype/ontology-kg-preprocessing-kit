@@ -1,0 +1,49 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix obo: <http://purl.obolibrary.org/obo/>
+prefix biolink: <https://w3id.org/biolink/vocab/>
+
+SELECT ?subject ?object ?relation ?edge_label WHERE 
+{
+?s ?r ?o .
+FILTER(isIRI(?s))
+FILTER(isIRI(?o))
+FILTER(isIRI(?r))
+FILTER(?r IN (rdfs:subClassOf, owl:equivalentClass))
+BIND(
+	IF(	
+		regex(str(?s), "http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]EFO[_]")
+			|| regex(str(?s), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]")
+			|| regex(str(?s), "http[:][/][/]www[.]orpha.net[/]ORDO[/]"),
+		REPLACE(
+			REPLACE(STR(?s), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]|http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]|http[:][/][/]www[.]orpha.net[/]ORDO[/]", "", "i"),
+		"[_]", ":", "i")
+		,?s) 
+	AS ?subject)
+BIND(
+	IF(	
+		regex(str(?o), "http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]EFO[_]")
+			|| regex(str(?o), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]")
+			|| regex(str(?o), "http[:][/][/]www[.]orpha.net[/]ORDO[/]"),
+		REPLACE(
+			REPLACE(STR(?o), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]|http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]|http[:][/][/]www[.]orpha.net[/]ORDO[/]", "", "i"),
+		"[_]", ":", "i")
+		,?o) 
+	AS ?object)
+BIND(
+	IF(	
+		regex(str(?r), "http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]EFO[_]")
+			|| regex(str(?r), "http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]")
+			|| regex(str(?r), "http[:][/][/]www[.]w3[.]org[/]2000[/]01[/]rdf[-]schema[#]")
+			|| regex(str(?r), "http[:][/][/]www[.]w3[.]org[/]2002[/]07[/]owl[#]")
+			|| regex(str(?r), "http[:][/][/]www[.]orpha.net[/]ORDO[/]"),
+		REPLACE(
+			REPLACE(
+				REPLACE(
+					REPLACE(STR(?r),"http[:][/][/]www[.]w3[.]org[/]2000[/]01[/]rdf[-]schema[#]","rdfs:","i"),
+				"http[:][/][/]www[.]w3[.]org[/]2002[/]07[/]owl[#]","owl:","i"),
+			"http[:][/][/]purl[.]obolibrary[.]org[/]obo[/]|http[:][/][/]www[.]ebi[.]ac[.]uk[/]efo[/]|http[:][/][/]www[.]orpha.net[/]ORDO[/]", "", "i"),
+		"[_]", ":", "i"), ?r) 
+	AS ?relation)
+}

@@ -1,6 +1,6 @@
 # Building docker image
 VERSION = "v0.0.1" 
-IM=obolibrary/okpk
+IM=matentzn/okpk
 
 docker-build:
 	@docker build -t $(IM):$(VERSION) . \
@@ -14,7 +14,7 @@ all:
 	echo "nothing"
 
 okpk:
-	python ontology-kg-preprocessing-kit.py ontology-kg-preprocessing-kit-config.yaml
+	python ontology-kg-preprocessing-kit.py okpk-example-config.yaml
 	
 count:
 	robot query --use-graphs true -f csv -i build/hp/hp.owl --query build/hp/hp_count_ap.sparql build/hp/hp_count_ap.csv
