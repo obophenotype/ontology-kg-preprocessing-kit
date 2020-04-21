@@ -26,14 +26,87 @@ We will discuss these steps in more depth in the following.
 
 ## Detailed breakdown of pipeline workings
 
+
+
+## Example configuration
+
+### Configuration file breakdown
+
+| Parameter | Explanation |
+| --------- | ----------- |
+| robot_opts | Global parameters that can be passed to the robot command, such as -vvv |
+| clean | true or false: if true, build directories are wiped prior to build. |
+| curie_map | Key value pairs of ID to IRI prefix. These are used to automatically generate CURIE style rendering of ids for CSV output formats. |
+| global | A set of global configurations that apply to all ontologies in the pipeline. |
+| relations | A list of relations that should be considered by the pipeline. All other relationships are removed. |
+| annotations | A list of annotation properties that will be considered by the pipeline. All other relationships are removed. |
+| ontologies | A list of ontologies that will be preprocessed by the pipeline. |
+| id | In the context of an ontology, this is the ontology id, like go, hp, obi. In the context of a term, this is the CURIE denoting the term. |
+| sources | A list of a ontology URLs that together constitute the ontology |
+| roots | A map of terms in the ontology that define the root notes that will be be considered for export. Overall, OKPK will import the root, all its children an all terms related directly to those terms. |
+| chains | A list of role chains that is materialised by the OKPK pipeline. |
+| materialize | A boolean flag to say whether OKPK should materialize the relation listed. |
+
+### Example file
+
+```
+robot_opts: -vv
+clean: false
+curie_map:
+  RO: http://purl.obolibrary.org/obo/RO_
+  HP: http://purl.obolibrary.org/obo/HP_
+  BFO: http://purl.obolibrary.org/obo/BFO_
+  UPHENO: http://purl.obolibrary.org/obo/UPHENO_
+  oio: http://www.geneontology.org/formats/oboInOwl#
+  IAO: http://purl.obolibrary.org/obo/IAO_
+  dce: http://purl.org/dc/elements/1.1/
+global:
+  relations: []
+  annotations:
+    - id: rdfs:label
+    - id: skos:exactMatch
+    - id: oio:hasExactSynonym
+    - id: IAO:0000115
+ontologies:
+  - id: hp
+    sources: 
+      - http://purl.obolibrary.org/obo/hp.owl
+    roots:
+      - id: HP:0000118
+        biolink: biolink:PhenotypicFeature
+    relations:
+      - id: UPHENO:0000001
+        biolink: biolink:DiseaseOrPhenotypicFeatureAssociationToThingAssociation
+        materialize: true
+        chains:
+          - BFO:0000051|RO:0000052
+      - id: BFO:0000051
+        materialize: true
+  - id: mondo
+    sources: 
+      - http://purl.obolibrary.org/obo/mondo.owl
+  - id: go
+    sources: 
+      - http://purl.obolibrary.org/obo/go/go-plus.owl
+```
+
 ## Setup
 
 The pipeline is designed to be run as a docker container. To set it up, follow these steps (you have to have docker installed):
 
-1. Download the docker wrapper script (okpk.sh)
-2. Provide a configuration file (okpk-example-config.yaml) in the same directory as the above script
+1. Download the docker wrapper script ([okpk.sh](https://github.com/obophenotype/ontology-kg-preprocessing-kit/blob/master/okpk.sh))
+2. Provide a configuration file ([okpk-example-config.yaml](https://github.com/obophenotype/ontology-kg-preprocessing-kit/blob/master/okpk-example-config.yaml)) in the same directory as the above script
 3. You should now be able to run the pipeline as follows:
+
+An example repository including a fully configured Jenkins job can be found here:
+https://github.com/obophenotype/covid-kg-ontology-preprocessing
 
 ```
 sh okpk.sh okpk-example-config.yaml
 ```
+
+## Editors notes:
+
+The okpk is currently build automatically using docker-hub + GitHub integration:
+https://hub.docker.com/repository/docker/matentzn/okpk/builds
+
