@@ -498,8 +498,10 @@ def prepare_entities_of_interest(o,roots,properties,curie_map,query_file):
     sparql.append('owl:someValuesFrom ?y ]  .')
     sparql.append('FILTER(isIRI(?s))')
     sparql.append('FILTER(isIRI(?y))')
-    sparql.append(sparql_in_filter(roots,"x"))
-    sparql.append(sparql_in_filter(properties,"p"))
+    if roots:
+        sparql.append(sparql_in_filter(roots,"x"))
+    if properties:
+        sparql.append(sparql_in_filter(properties,"p"))
     sparql.append('}')
     write_list_to_file(query_file,sparql)
 
