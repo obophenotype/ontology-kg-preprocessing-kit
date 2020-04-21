@@ -197,7 +197,7 @@ def robot_remove_terms(ontology_path,remove_list, ontology_removed_path, TIMEOUT
         print(e.output)
         raise Exception("Removing disjoint class axioms from " + ontology_path + " failed")
 
-def robot_remove_mentions_of_nothing(ontology_path, ontology_removed_path, TIMEOUT="3600", robot_opts="-v"):
+def robot_remove_mentions_of_nothing(ontology_path, ontology_removed_path, TIMEOUT="60m", robot_opts="-v"):
     print("Removing mentions of nothing from "+ontology_path+" and saving to "+ontology_removed_path)
     try:
         check_call(['timeout',TIMEOUT,'robot', 'remove',robot_opts,'-i', ontology_path,'--term','http://www.w3.org/2002/07/owl#Nothing', '--axioms','logical','--preserve-structure', 'false', '--output', ontology_removed_path])
@@ -212,7 +212,7 @@ def remove_all_sources_of_unsatisfiability(o, blacklist_ontology, TIMEOUT, robot
     if os.path.exists(blacklist_ontology):
         robot_remove_upheno_blacklist_and_classify(o, o, blacklist_ontology, TIMEOUT, robot_opts)
 
-def robot_remove_axioms_that_could_cause_unsat(ontology_path, ontology_removed_path, TIMEOUT="3600", robot_opts="-v"):
+def robot_remove_axioms_that_could_cause_unsat(ontology_path, ontology_removed_path, TIMEOUT="60m", robot_opts="-v"):
     print("Removing axioms that could cause unsat from "+ontology_path+" and saving to "+ontology_removed_path)
     try:
         check_call(['timeout',TIMEOUT,'robot', 'remove',robot_opts,'-i', ontology_path, '--axioms','"DisjointClasses DisjointUnion DifferentIndividuals NegativeObjectPropertyAssertion NegativeDataPropertyAssertion FunctionalObjectProperty InverseFunctionalObjectProperty ReflexiveObjectProperty IrrefexiveObjectProperty ObjectPropertyDomain ObjectPropertyRange DisjointObjectProperties FunctionalDataProperty DataPropertyDomain DataPropertyRange DisjointDataProperties"','--preserve-structure', 'false', '--output', ontology_removed_path])
@@ -396,7 +396,7 @@ def robot_okpk_enrich(ontologies,materialize_props,ontology_path, TIMEOUT="60m",
         cmd.extend(['robot',robot_opts, 'merge'])
         for o in ontologies:
             cmd.extend(['-i', o])
-        cmd.extend(['reason', '--reasoner', 'ELK', 'reduce','--reasoner', 'ELK'])
+        cmd.extend(['reason', '--reasoner', 'ELK'])
         if materialize_props:
             cmd.extend(['materialize', '--reasoner', 'ELK'])
             for p in materialize_props:
