@@ -570,7 +570,8 @@ def prepare_sparql_count_object_properties(o,roots,curie_map,query_file):
     sparql.append('owl:someValuesFrom ?y ]  .')
     sparql.append('FILTER(isIRI(?s))')
     sparql.append('FILTER(isIRI(?y))')
-    sparql.append(sparql_in_filter(roots,"x"))
+    if roots:
+        sparql.append(sparql_in_filter(roots,"x"))
     sparql.append('}')
     sparql.append('GROUP BY ?p ')
     write_list_to_file(query_file,sparql)
@@ -583,7 +584,8 @@ def prepare_sparql_count_annotation_properties(o,roots,curie_map,query_file):
     sparql.append('?s ?p ?y .') 
     sparql.append('?p a owl:AnnotationProperty  .')
     sparql.append('FILTER(isIRI(?s))')
-    sparql.append(sparql_in_filter(roots,"x"))
+    if roots:
+        sparql.append(sparql_in_filter(roots,"x"))
     sparql.append('}')
     sparql.append('GROUP BY ?p ')
     write_list_to_file(query_file,sparql)
