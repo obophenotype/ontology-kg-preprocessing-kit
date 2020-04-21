@@ -5,6 +5,7 @@ import urllib.request
 import yaml
 import warnings
 import re
+import shutil
 
 class okpk_config:
     def __init__(self, config_file):
@@ -410,15 +411,18 @@ def robot_okpk_enrich(ontologies,materialize_props,ontology_path, TIMEOUT="60m",
         
 def robot_okpk_reduce(o,properties,ontology_path, TIMEOUT="60m", robot_opts="-v"):
     try:
-        cmd = ['timeout',TIMEOUT]
-        cmd.extend(['robot',robot_opts])
         if properties:
+            cmd = ['timeout',TIMEOUT]
+            cmd.extend(['robot',robot_opts])
+            
             cmd.extend(['remove', '-i',o])
             for p in properties:
                 cmd.extend(['--term', p])
             cmd.extend(['--select','complement','--select', 'object-properties'])
-        cmd.extend(['-o',ontology_path])
-        check_call(cmd)
+            cmd.extend(['-o',ontology_path])
+            check_call(cmd)
+        else:
+            shutil.copyfile(o, ontology_path)
     except Exception as e:
         print(e.output)
         raise Exception("Running ROBOT Pipeline towards {} failed".format(ontology_path))
