@@ -1,6 +1,6 @@
 robot_opts: -vv
 clean: False
-working_directory: /work
+timeout_external_processes: 300m
 curie_map:
   RO: http://purl.obolibrary.org/obo/RO_
   HP: http://purl.obolibrary.org/obo/HP_

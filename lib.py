@@ -489,19 +489,19 @@ def download_from_urls(o,sources,o_build_dir,skip=False):
 
 def prepare_entities_of_interest(o,roots,properties,curie_map,query_file):
     sparql = get_default_sparql_header(curie_map)
-    sparql.append('SELECT ?s ?p ?y ?ap WHERE ')
+    sparql.append('SELECT ?s ?p ?y WHERE ')
     sparql.append('{')
     sparql.append('?s rdfs:subClassOf* ?x . ')
-    sparql.append('?s rdfs:subClassOf [')
+    sparql.append('OPTIONAL { ?s rdfs:subClassOf [')
     sparql.append('a owl:Restriction ;')
     sparql.append('owl:onProperty ?p ;')
-    sparql.append('owl:someValuesFrom ?y ]  .')
+    sparql.append('owl:someValuesFrom ?y ] }')
     sparql.append('FILTER(isIRI(?s))')
-    sparql.append('FILTER(isIRI(?y))')
+    sparql.append('FILTER(!bound(?y) || isIRI(?y))')
     if roots:
         sparql.append(sparql_in_filter(roots,"x"))
     if properties:
-        sparql.append(sparql_in_filter(properties,"p"))
+        sparql.append(sparql_in_filter(properties,"p",True))
     sparql.append('}')
     write_list_to_file(query_file,sparql)
 
@@ -540,8 +540,11 @@ def prepare_sparql_biolink_annotations(o,biolink_categories,curie_map,query_fold
         i += 1
     return biolink_annotation_files
 
-def sparql_in_filter(l,variable):
-    f1='FILTER(?{} IN ('.format(variable)
+def sparql_in_filter(l,variable,isBoundClause=False):
+    boundclause=""
+    if isBoundClause:
+        boundclause="!bound(?{}) || ".format(variable)
+    f1='FILTER({}?{} IN ('.format(boundclause,variable)
     for e in l:
         f1+=e+", "
     f1 = f1.strip()[:-1]
