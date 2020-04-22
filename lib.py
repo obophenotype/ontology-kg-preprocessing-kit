@@ -147,11 +147,15 @@ def robot_query(ontology_path,query_result,sparql_query, TIMEOUT="60m", robot_op
 def robot_update(ontology_path,sparql_queries,ontology_out_path, TIMEOUT="60m", robot_opts="-v"):
     print("Querying "+ontology_path+" with "+str(sparql_queries))
     try:
-        robot = ['timeout',TIMEOUT,'robot', 'query',robot_opts,'-i', ontology_path]
-        for ru in sparql_queries:
-            robot.extend(['--update', ru])
-        robot.extend(['--output', ontology_out_path])
-        check_call(robot)
+        if sparql_queries:
+            robot = ['timeout',TIMEOUT,'robot', 'query',robot_opts,'-i', ontology_path]
+            for ru in sparql_queries:
+                robot.extend(['--update', ru])
+            robot.extend(['--output', ontology_out_path])
+            check_call(robot)
+        else:
+            print("robot_update: No queries provided, copying input ontology unchanged.")
+            shutil.copyfile(ontology_path, ontology_out_path)
     except Exception as e:
         print(e.output)
         raise Exception("Querying {} with {} failed".format(ontology_path,sparql_queries))
